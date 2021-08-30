@@ -1,3 +1,7 @@
+//** All the funny variables are because some of the original variable names were in my game, 
+//** so I had to change them to keep it from crashing.
+//** If someone else uses this code and it won't work they may need to change other variables */
+
 //***PIANO****
 mySong = [1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21];
 let on = false;	
