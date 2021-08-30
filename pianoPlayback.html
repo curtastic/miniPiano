@@ -48,6 +48,7 @@ let interval = setInterval(function(){
       on= false;
     }else{
       if(!on){
+            mySong = (d.value).split(',').map(Number);
             on=true;
             music(mySong,3,o.checked);
         }
@@ -55,7 +56,7 @@ let interval = setInterval(function(){
 
   }, 2000);
 
-    mySong = (d.value).split(',').map(Number);
+    
     // mySong = [1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21];
     // guitarSong = [2,2,3,3,4,4,5,6,7];
      let on = false;
