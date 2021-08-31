@@ -16,6 +16,7 @@ b.innerHTML =
   <input type=radio name=R checked id=no>Stop
   <p>Notes: [ <input id=d value=1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21 size=50> ]
   <p> length: <input id=long value=3 size=20>
+  <p> speed: <input id=speed value=1000 size=20>
   <p><div id=p>
 `;
 
@@ -42,6 +43,8 @@ for(i = 0; i < 36; i++){
   `;
 }
 
+
+let on = false;
 // function creation
 let interval = setInterval(function(){
   if(no.checked){
@@ -55,36 +58,27 @@ let interval = setInterval(function(){
         }
     }
 
-  }, 2000);
+  }, 1000);
 
-    
-    // mySong = [1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21];
-    // guitarSong = [2,2,3,3,4,4,5,6,7];
-     let on = false;
-    // onclick = e => {
-    //     if(!on){
-    //         on=true;
-    //         music(mySong,3,o.checked);
-    //     }
-    // }
     var timerId;
     function music(song,len,piano){
         let note = 0;
         timerId= setTimeout(function run() {
-        playNote(getF(song[note]),len,piano);
+        playNote(song[note],len,piano);
         if(note==song.length){
             note=0;
         }
         note++;
-        timerId = setTimeout(run, 1000);
-        }, 1000);
+        timerId = setTimeout(run, speed.value);
+        }, speed.value);
         on = true;
     }
     function getF(i){ return 130.81 * 1.06 ** i;}
 
         // Play a note - https://xem.github.io/js1k19/miniSynth/
 		function playNote(note,len,piano){
-        for(
+      note = getF(note);  
+      for(
   
     // V: note length in seconds
     V = len,

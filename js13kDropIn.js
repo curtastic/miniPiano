@@ -108,7 +108,6 @@ function getD(note, len, piano){
           : (1 - (tick - 88.2) / (44100 * (V - .002))) ** (uh ? (.5 * Math.log(1e4 * note / 44100)) ** 2 : 1) * w(tick, note);
         }
         return D;
-
 }
 //***END PIANO****
 

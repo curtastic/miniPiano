@@ -1,0 +1,2 @@
+[1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21] len:3 speed:1000 Description: melancholy
+[28,25,28,23,25,24,21,21,12,15,16,12] len:2 speed:500 Description: adventurous/sad
