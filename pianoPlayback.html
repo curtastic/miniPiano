@@ -14,11 +14,13 @@ b.innerHTML =
   <input type=radio name=U>Guitar
   <input type=radio name=R>Play
   <input type=radio name=R checked id=no>Stop
-  <p>Notes: [ <input id=d value=1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21 size=50> ]
+  <p>Notes: [ <input id=d value=1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21 size=50> ]<button style="margin-left:10px;"type="button" id="butt">Clear</button>
   <p> length: <input id=long value=3 size=20>
   <p> speed: <input id=speed value=1000 size=20>
   <p><div id=p>
 `;
+
+document.getElementById("butt").onclick = function() {clear()};
 
 n = e => {
   playNote(e,long.value,o.checked);
@@ -27,7 +29,9 @@ n = e => {
   }else{
   d.value +=","+e;}
 }
-
+function clear(){
+  d.value="";
+}
 for(i = 0; i < 36; i++){
   p.innerHTML += `
 
