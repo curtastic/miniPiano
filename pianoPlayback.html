@@ -9,6 +9,9 @@
 b.innerHTML = 
 `
   <h1>Piano Playback - Each note is a number</h1>
+  <h3>How to use: click "Play" to play song, this also loads keyboard.</h3>
+  <small>Change instrument, length of notes, speed of interval, 
+  "Play" reloads everything after changes. </small>
   <p>
   <input type=radio name=U checked id=o>Piano
   <input type=radio name=U>Guitar
@@ -24,7 +27,8 @@ b.innerHTML =
 document.getElementById("butt").onclick = function() {clear()};
 
 n = e => {
-  playNote(e,long.value,o.checked);
+    playThePiano(e,long.value, o.checked);
+
   if(d.value===""){
     d.value += e;
   }else{
@@ -58,6 +62,51 @@ for(i = 0; i < 36; i++){
   `;
 }
 
+const builtSong =[];
+const builtPiano = [];
+var audioCtx = [];
+
+for(i=0;i<10;i++){
+  audioCtx[i]= new AudioContext;
+}
+var Note = new AudioContext;
+
+function buildsong(mySong, len, piano){
+  let i =0;
+  let j;
+  mySong.forEach(element => {
+          j=i%10;
+          builtSong.push( audioCtx[j].createBuffer(1, 1e6, 44100));
+          builtSong[i].getChannelData(0).set(getD(element,len,piano));
+          i++;
+  });
+  console.log("buildSong...");
+  i=0;
+  for(i=0;i<36;i++){
+    j=i%10;
+    builtPiano.push( audioCtx[j].createBuffer(1, 1e6, 44100));
+    builtPiano[i].getChannelData(0).set(getD(i,len,piano));
+  }
+  console.log("buildPiano...");
+}
+
+var timerId;
+
+function playTheSong(song){
+  let elm = 0;
+  timerId= setTimeout(function run() {
+  console.log(elm);
+  if(elm==builtSong.length){
+      console.log("reached end");
+      playTheSong(song);
+  }else{
+  playTheNote(elm);
+  elm++;
+  timerId = setTimeout(run, speed.value);}
+  }, speed.value);
+  on = true;
+  console.log("play song...");
+}
 
 let on = false;
 // function creation
@@ -67,102 +116,98 @@ let interval = setInterval(function(){
       on= false;
     }else{
       if(!on){
+            
             mySong = (d.value).split(',').map(Number);
+            buildsong(mySong,long.value,o.checked);
             on=true;
-            music(mySong,long.value,o.checked);
+            playTheSong(mySong);
         }
     }
 
   }, 1000);
 
-    var timerId;
-    function music(song,len,piano){
-        let note = 0;
-        timerId= setTimeout(function run() {
-        playNote(song[note],len,piano);
-        if(note==song.length){
-            note=0;
+function playTheNote(note){
+    j = note%10;
+    source = audioCtx[j].createBufferSource();
+    source.buffer = builtSong[note];
+    source.connect(audioCtx[j].destination);
+    source.start();
+}
+
+function playThePiano(note){
+    j = note%10;
+    source = audioCtx[j].createBufferSource();
+    source.buffer = builtPiano[note];
+    source.connect(audioCtx[j].destination);
+    source.start();
+}
+
+function getF(i){ return 130.81 * 1.06 ** i;}
+
+function getD(note, len, piano){
+    note = getF(note);
+    for(
+
+        // V: note length in seconds
+        V = len,
+        
+        // O: piano is selected
+        uh = piano,
+        
+        // Temp vars for guitar synthesis
+        vv = [],
+        pp = ch = 0,
+        
+        // Modulation
+        // This function generates the i'th sample of a sinusoidal signal with a specific frequency and amplitude
+        b = (note, tt, aa, tick) => Math.sin(note / tt * 6.28 * aa + tick),
+        
+        // Instrument synthesis
+        w = (note, tt) =>
+        
+          uh
+        
+          // Piano
+          ? Math.sin(note / 44100 * tt * 6.28 + b(note, 44100, tt, 0) ** 2 + .75 * b(note, 44100, tt, .25) + .1 * b(note, 44100, tt, .5))
+          
+          // Guitar
+          : (
+            P = 44100 / tt,
+            rr = 0,
+            vv.length <= 1 + ~~P
+            ? (vv.push(2 * Math.random() - 1), vv[vv.length - 1])
+            : (vv[pp] = .5 * (
+              vv[pp >= vv.length - 1 ? 0 : pp + 1] + vv[pp]
+              ),
+              pp >= ~~P && (
+                pp < 1 + ~~P 
+                ? ch % 100 >= ~~(100 * (P - ~~P)) &&(rr = 1, vv[pp+1] = .5 * (vv[0] + vv[pp + 1]), ch++)
+                : rr = 1
+              ),
+              pp = rr ? 0 : pp + 1,
+              vv[pp]
+            )
+          ),
+        // Sound samples
+        D = [],
+        
+        // Loop on all the samples
+        tick = 0;
+        tick < 44100 * V;
+        tick++
+        ){
+        
+        // Fill the samples array
+        D[tick] =
+        
+          // The first 88 samples represent the note's attack
+          tick < 88 
+          ? tick / 88.2 * w(tick, note) 
+          
+          // The other samples represent the rest of the note
+          : (1 - (tick - 88.2) / (44100 * (V - .002))) ** (uh ? (.5 * Math.log(1e4 * note / 44100)) ** 2 : 1) * w(tick, note);
         }
-        note++;
-        timerId = setTimeout(run, speed.value);
-        }, speed.value);
-        on = true;
-    }
-    function getF(i){ return 130.81 * 1.06 ** i;}
-
-        // Play a note - https://xem.github.io/js1k19/miniSynth/
-		function playNote(note,len,piano){
-      note = getF(note);  
-      for(
-  
-    // V: note length in seconds
-    V = len,
-    
-    // O: piano is selected
-    uh = piano,
-    
-    // Temp vars for guitar synthesis
-    vv = [],
-    pp = ch = 0,
-    
-    // Modulation
-    // This function generates the i'th sample of a sinusoidal signal with a specific frequency and amplitude
-    b = (note, tt, aa, tick) => Math.sin(note / tt * 6.28 * aa + tick),
-    
-    // Instrument synthesis
-    w = (note, tt) =>
-    
-      uh
-
-      // Piano
-      ? Math.sin(note / 44100 * tt * 6.28 + b(note, 44100, tt, 0) ** 2 + .75 * b(note, 44100, tt, .25) + .1 * b(note, 44100, tt, .5))
-      
-      // Guitar
-      : (
-        P = 44100 / tt,
-        rr = 0,
-        vv.length <= 1 + ~~P
-        ? (vv.push(2 * Math.random() - 1), vv[vv.length - 1])
-        : (vv[pp] = .5 * (
-          vv[pp >= vv.length - 1 ? 0 : pp + 1] + vv[pp]
-          ),
-          pp >= ~~P && (
-            pp < 1 + ~~P 
-            ? ch % 100 >= ~~(100 * (P - ~~P)) &&(rr = 1, vv[pp+1] = .5 * (vv[0] + vv[pp + 1]), ch++)
-            : rr = 1
-          ),
-          pp = rr ? 0 : pp + 1,
-          vv[pp]
-        )
-      ),
-    // Sound samples
-    D = [],
-    
-    // Loop on all the samples
-    tick = 0;
-    tick < 44100 * V;
-    tick++
-  ){
-  
-    // Fill the samples array
-    D[tick] =
-    
-      // The first 88 samples represent the note's attack
-      tick < 88 
-      ? tick / 88.2 * w(tick, note) 
-      
-      // The other samples represent the rest of the note
-      : (1 - (tick - 88.2) / (44100 * (V - .002))) ** (uh ? (.5 * Math.log(1e4 * note / 44100)) ** 2 : 1) * w(tick, note);
-  }
- 
-  // Play the note
-  A = new AudioContext,
-  mm = A.createBuffer(1, 1e6, 44100),
-  mm.getChannelData(0).set(D),
-  ss = A.createBufferSource(),
-  ss.buffer = mm,
-  ss.connect(A.destination),
-  ss.start()
+        return D;
 }
 //
 
