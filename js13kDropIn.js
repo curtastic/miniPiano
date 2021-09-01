@@ -3,43 +3,57 @@
 //** If someone else uses this code and it won't work they may need to change other variables */
 // https://xem.github.io/js1k19/miniSynth/
 //***PIANO****
+// testing
+test =[1,2,3];
+// default speed
 mySong = [1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21];
+//200 speed
+juliaSong = [0,7,12,9,7,12,9,0,31,7,12,9,28,7,12,26,9,0,7,28,12,9,7,12,9,0,7,12,9,7,12,9,0,7,12,9,28,7,12,26,9,0,7,28,12,9,7,12,9,0,7,12,9,7,12,9,0];
 let on = false;	 
 var timerId;
+var speed = 200;
 const builtSong =[];
+var count=0;
+var audioCtx = [];
+
+for(i=0;i<10;i++){
+  audioCtx[i]= new AudioContext;
+}
 
 function buildsong(mySong, len, piano){
-    mySong.forEach(element => {
-            builtSong.push(getD(element,len,piano));
-            console.log(builtSong.length);
-    });
-    console.log("buildsong...");
+  let i =0;
+  let j;
+  mySong.forEach(element => {
+          j=i%10;
+          builtSong.push( audioCtx[j].createBuffer(1, 1e6, 44100));
+          builtSong[i].getChannelData(0).set(getD(element,len,piano));
+          i++;
+  });
+  console.log("buildsong...");
 }
 
 function playTheSong(song){
-    let elm = 0;
-    timerId= setTimeout(function run() {
-    console.log(elm);
-    if(elm==song.length){
-        elm=0;
-        console.log("reached end");
-    }
-    playTheNote(song[elm]);
-    elm++;
-    timerId = setTimeout(run, 1000);
-    }, 1000);
-    on = true;
-console.log("play song...");
+  let elm = 0;
+  timerId= setTimeout(function run() {
+  console.log(elm);
+  if(elm==builtSong.length){
+      console.log("reached end");
+      playTheSong(song);
+  }else{
+  playTheNote(elm);
+  elm++;
+  timerId = setTimeout(run, 200);}
+  }, 200);
+  on = true;
+  console.log("play song...");
 }
 
-function playTheNote(D){
-    A = new AudioContext,
-    mm = A.createBuffer(1, 1e6, 44100),
-    mm.getChannelData(0).set(D),
-    ss = A.createBufferSource(),
-    ss.buffer = mm,
-    ss.connect(A.destination),
-    ss.start()
+function playTheNote(note){
+    j = note%10;
+    source = audioCtx[j].createBufferSource();
+    source.buffer = builtSong[note];
+    source.connect(audioCtx[j].destination);
+    source.start();
 }
 
 function getF(i){ return 130.81 * 1.06 ** i;}
@@ -121,7 +135,7 @@ onclick = e => {
 if(!on){
     on=true;
     // build the song
-    buildsong(mySong, 3, true);
+    buildsong(juliaSong, 2, true);
 
     // play the song
     playTheSong(builtSong);
@@ -131,6 +145,10 @@ if(!on){
 // Play individual notes:
 let notePlay =false;
 if(notePlay){
-    let buildNote = getD(32, 3, false); // false for guitar
-    playNote(buildNote);
+    let singleNote = audioCtx[0].createBuffer(1, 1e6, 44100);
+    singleNote.getChannelData(0).set(getD(32,3,false)); // false for guitar
+    source = singleNote.createBufferSource();
+    source.buffer = builtSong[note];
+    source.connect(audioCtx[j].destination);
+    source.start();
 }
