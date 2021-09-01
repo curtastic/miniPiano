@@ -62,18 +62,18 @@ for(i = 0; i < 36; i++){
   `;
 }
 
-const builtSong =[];
+var builtSong =[];
 const builtPiano = [];
 var audioCtx = [];
+var firstClick = false;
 
-for(i=0;i<10;i++){
-  audioCtx[i]= new AudioContext;
-}
-var Note = new AudioContext;
-
+// still have problem with buildsong, 
+///when it gets called multiple times I push new buffers to array
+/// instead over overwriting/deleting what was there. I'll try to fix latter"
 function buildsong(mySong, len, piano){
   let i =0;
   let j;
+  builtSong =[];
   mySong.forEach(element => {
           j=i%10;
           builtSong.push( audioCtx[j].createBuffer(1, 1e6, 44100));
@@ -95,11 +95,11 @@ var timerId;
 function playTheSong(song){
   let elm = 0;
   timerId= setTimeout(function run() {
-  console.log(elm);
   if(elm==builtSong.length){
       console.log("reached end");
       playTheSong(song);
   }else{
+  console.log(elm);
   playTheNote(elm);
   elm++;
   timerId = setTimeout(run, speed.value);}
@@ -116,7 +116,12 @@ let interval = setInterval(function(){
       on= false;
     }else{
       if(!on){
-            
+            if(!firstClick){
+              for(i=0;i<10;i++){
+                  audioCtx[i]= new AudioContext;
+                  }
+              var Note = new AudioContext;
+            }
             mySong = (d.value).split(',').map(Number);
             buildsong(mySong,long.value,o.checked);
             on=true;

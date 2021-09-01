@@ -16,7 +16,7 @@ const builtSong =[];
 var count=0;
 var audioCtx = [];
 
-for(i=0;i<10;i++){
+for(i=0;i<11;i++){
   audioCtx[i]= new AudioContext;
 }
 
@@ -144,11 +144,15 @@ if(!on){
 
 // Play individual notes:
 let notePlay =false;
+var singleNote = audioCtx[10].createBuffer(1, 1e6, 44100);
+singleNote.getChannelData(0).set(getD(32,3,false));
 if(notePlay){
-    let singleNote = audioCtx[0].createBuffer(1, 1e6, 44100);
-    singleNote.getChannelData(0).set(getD(32,3,false)); // false for guitar
-    source = singleNote.createBufferSource();
-    source.buffer = builtSong[note];
-    source.connect(audioCtx[j].destination);
+    playTheNote(singleNote);
+}
+
+function playTheNote(note){
+    source = audioCtx[10].createBufferSource();
+    source.buffer = note;
+    source.connect(audioCtx[10].destination);
     source.start();
 }
