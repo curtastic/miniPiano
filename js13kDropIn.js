@@ -12,48 +12,46 @@ juliaSong = [0,7,12,9,7,12,9,0,31,7,12,9,28,7,12,26,9,0,7,28,12,9,7,12,9,0,7,12,
 let on = false;	 
 var timerId;
 var speed = 200;
-const builtSong =[];
+var builtSong =[];
 var count=0;
 var audioCtx = [];
 
-for(i=0;i<11;i++){
-  audioCtx[i]= new AudioContext;
-}
+
 
 function buildsong(mySong, len, piano){
   let i =0;
   let j;
+  console.log("buildsong...");
   mySong.forEach(element => {
           j=i%10;
           builtSong.push( audioCtx[j].createBuffer(1, 1e6, 44100));
           builtSong[i].getChannelData(0).set(getD(element,len,piano));
           i++;
   });
-  console.log("buildsong...");
 }
 
 function playTheSong(song){
+  console.log("play song...");
   let elm = 0;
   timerId= setTimeout(function run() {
-  console.log(elm);
   if(elm==builtSong.length){
       console.log("reached end");
       playTheSong(song);
   }else{
+  console.log(elm);
   playTheNote(elm);
   elm++;
   timerId = setTimeout(run, 200);}
   }, 200);
   on = true;
-  console.log("play song...");
 }
 
 function playTheNote(note){
-    j = note%10;
-    source = audioCtx[j].createBufferSource();
-    source.buffer = builtSong[note];
-    source.connect(audioCtx[j].destination);
-    source.start();
+  j = note%10;
+  source = audioCtx[j].createBufferSource();
+  source.buffer = builtSong[note];
+  source.connect(audioCtx[j].destination);
+  source.start();
 }
 
 function getF(i){ return 130.81 * 1.06 ** i;}
@@ -134,6 +132,11 @@ function getD(note, len, piano){
 onclick = e => {
 if(!on){
     on=true;
+    for(i=0;i<11;i++){
+      audioCtx[i]= new AudioContext;
+    }
+    var singleNote = audioCtx[10].createBuffer(1, 1e6, 44100);
+    singleNote.getChannelData(0).set(getD(32,3,false));
     // build the song
     buildsong(juliaSong, 2, true);
 
@@ -144,13 +147,12 @@ if(!on){
 
 // Play individual notes:
 let notePlay =false;
-var singleNote = audioCtx[10].createBuffer(1, 1e6, 44100);
-singleNote.getChannelData(0).set(getD(32,3,false));
+
 if(notePlay){
-    playTheNote(singleNote);
+    playOneNote(singleNote);
 }
 
-function playTheNote(note){
+function playOneNote(note){
     source = audioCtx[10].createBufferSource();
     source.buffer = note;
     source.connect(audioCtx[10].destination);
