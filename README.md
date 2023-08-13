@@ -1,8 +1,23 @@
 # miniPiano
-mini piano app outputting tiny js code forked from xem
+Mini piano tiny js code forked from vertfromage forked from xem.
 
-I added a pianoPlayBack app to test sequences and js dropIn to use in my game.
-Try the demo: https://vertfromage.github.io/miniPiano/pianoPlayback.html
+Try the demo https://curtastic.com/miniPiano/demo.html
+
+EXAMPLE USE:
+piano.play([7,9,,9,10,12])
+Numbers are note pitch.
+Leave gaps to make silence.
+Loops forever.
+
+TO STOP:
+piano.play([])
+
+FAST TEMPO EXAMPLE:
+piano.play([7,9,,9,10,12], 100)
+
+SHORTER NOTES EXAMPLE:
+piano.play([7,9,,9,10,12], 100, 9000)
+Longest noteLen allowed is 44100 (default)
 
 ToDo:
 Add ability to have tempo for individual notes (full/half/quarter)
