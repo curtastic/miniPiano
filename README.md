@@ -1,6 +1,8 @@
 # miniPiano
 Mini piano tiny js code forked from vertfromage forked from xem.
 
+Less than 1KB minified!
+
 Try the demo https://curtastic.com/miniPiano/demo.html
 
 EXAMPLE USE:
