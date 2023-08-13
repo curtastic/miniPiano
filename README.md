@@ -18,6 +18,7 @@ piano.play([])
 FAST TEMPO EXAMPLE:
 
 piano.play([7,9,,9,10,12], 100)
+Note spacing in milliseconds.
 
 SHORTER NOTES EXAMPLE:
 
