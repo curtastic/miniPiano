@@ -6,11 +6,11 @@ Less than 1KB minified!
 Try the demo https://curtastic.com/miniPiano/demo.html
 
 EXAMPLE USE:
+
 piano.play([7,9,,9,10,12])
 Numbers are note pitch.
 Leave gaps to make silence.
 Loops forever.
-12=MajorC
 
 TO STOP:
 
@@ -19,14 +19,20 @@ piano.play([])
 FAST TEMPO EXAMPLE:
 
 piano.play([7,9,,9,10,12], 100)
-Note spacing in milliseconds.
 
-SHORTER NOTES EXAMPLE:
+ALL NOTES ARE TWICE AS SHORT EXAMPLE:
 
-piano.play([7,9,,9,10,12], 100, 9000)
-Longest noteLen allowed is 44100 (default)
+piano.play([7,9,,9,10,12], 100, .5)
+Longest noteLen allowed is 1 (default)
 
-ToDo:
+SOME NOTES ARE LONGER EXAMPLE:
 
-Add ability to have tempo for individual notes (full/half/quarter)
+piano.play([7,-9,,9,10,-12,,])
+Use negative numbers to make a note twice as long.
+This won't make it take up 2 slots in your array.
 
+SOME NOTES ARE SHORTER EXAMPLE:
+
+piano.play([.11,,.11,,-11,,,,.09,,.09,,-9,,])
+Use a dot to make a note half as long.
+To play a 9 (lower A) short, use .09 not .9
