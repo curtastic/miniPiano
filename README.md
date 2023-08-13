@@ -10,6 +10,7 @@ piano.play([7,9,,9,10,12])
 Numbers are note pitch.
 Leave gaps to make silence.
 Loops forever.
+12=Major C
 
 TO STOP:
 
