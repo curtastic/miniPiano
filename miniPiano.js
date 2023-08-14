@@ -30,16 +30,13 @@ var piano = {
 	play: function(song, tempo, noteLen) {
 		tempo ||= 180
 		noteLen = (noteLen||1)*44100 | 0
-		if(this.interval) {
-			clearInterval(this.interval)
-		} else {
-			this.contexts = [...Array(11).keys()].map(_=>new AudioContext)
-		}
+		clearInterval(this.interval)
+		this.contexts ||= [...Array(11).keys()].map(_=>new AudioContext)
 		
-		var makeBuf = i => {
+		this.song = song.map((note, i) => {
+			if(!note)return 0
 			// V: note length in seconds
-			var note = song[i],
-				V = 2,
+			var V = 2,
 				len = noteLen
 			if(note < 0) {
 				note *= -1
@@ -82,38 +79,24 @@ var piano = {
 				  : (1 - (tick - 88.2) / (len * (V - .002))) ** ((Math.log(1e4 * note / len) / 2) ** 2) * w(tick, note)
 			}
 			
-			var b = this.contexts[i%10].createBuffer(1, D.length, noteLen)
+			b = this.contexts[0].createBuffer(1, D.length, noteLen)
 			b.getChannelData(0).set(D)
 			return b
-		}
-		
-		this.song = []
-		if(this.contexts[9]) {
-			for(var i=0; i<song.length; i++) {
-				if(!song[i]) {
-					this.song.push(0)
-				} else {
-					this.song[i] = makeBuf(i)
-				}
-			}
-		}
-		
-		var notePlay = i => {
-			if(this.song[i]) {
-				var ctx = this.contexts[i%10]
-				var source = ctx.createBufferSource()
-				source.buffer = this.song[i]
-				source.connect(ctx.destination)
-				source.start()
-			}
-		}
+		})
 		
 		this.noteI = 0
-		this.interval = setInterval(_ => {
-			if(this.noteI >= this.song.length) {
-				this.noteI = 0
+		this.interval = setInterval(i => {
+			if(this.noteI < this.song.length) {
+				i = this.noteI++
+				if(this.song[i]) {
+					var ctx = this.contexts[i%10]
+					var source = ctx.createBufferSource()
+					source.buffer = this.song[i]
+					source.connect(ctx.destination)
+					source.start()
+				}
 			} else {
-				notePlay(this.noteI++)
+				this.noteI = 0
 			}
 		}, tempo)
 	}
