@@ -20,6 +20,8 @@ Numbers are note pitch.
 Leave gaps to make silence.
 Loops forever.
 
+That's it! There's only 1 function, piano.play()
+
 TO STOP:
 ```
 piano.play([])
