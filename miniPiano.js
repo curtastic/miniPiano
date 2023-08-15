@@ -27,77 +27,77 @@ To play a 9 (lower A) short, use .09 not .9
 
 */
 var piano = {
+	songs: {},
+	// song is an array of numbers from 1 to 99. Leave gaps for empty space.
+	// tempo is the speed of the song in milliseconds between each note. Default is 180.
+	// noteLen is how long all notes are held down. From 0-1. Default is 1.
 	play: function(song, tempo, noteLen) {
-		tempo ||= 180
 		noteLen = (noteLen||1)*44100 | 0
+		this.contexts ||= [...Array(9).keys()].map(_=>new AudioContext)
+		
+		var cachedSong = this.songs[song]
+		if(!cachedSong) {
+			cachedSong = this.songs[song] = song.map((note, i) => {
+				if(note) {
+					// This note's length in seconds
+					var seconds = 2,
+						// Modulation
+						// This function generates the j'th sample of a sinusoidal signal with a specific frequency and amplitude
+						b = (note, add) => Math.sin(note*6.28 + add),
+						// Instrument synthesis
+						w = note => b(note, b(note,0)**2 + b(note,.25)*.75 + b(note,.5)*.1) * .1,
+						// Array of sound samples
+						a = [],
+						j
+					
+					// Negative number means this note is twice as long (a whole note)
+					if(note < 0) {
+						note *= -1
+						seconds = 4
+					}
+					
+					// With a decimal point means this note is half as long (a quarter note)
+					if(note < 1) {
+						note *= 100
+						seconds = 1
+					}
+					note = 65.406 * 1.06 ** note / noteLen
+					
+					// Loop on all the samples
+					for(j = noteLen * seconds; j--;) {
+						// Fill the samples array
+						a[j] =
+							// The first 88 samples represent the note's attack
+							(j < 88 ?
+								j / 88.2
+								// The other samples represent the rest of the note
+								: (1 - (j - 88.2) / (noteLen * (seconds - .002))) ** ((Math.log(1e4 * note) / 2) ** 2)
+							) * w(j * note)
+					}
+					
+					b = this.contexts[0].createBuffer(1, noteLen * seconds, noteLen)
+					b.getChannelData(0).set(a)
+					return b
+				}
+			})
+		}
+		this.song = cachedSong
+		
+		this.i = 0
 		clearInterval(this.interval)
-		this.contexts ||= [...Array(11).keys()].map(_=>new AudioContext)
-		
-		this.song = song.map((note, i) => {
-			if(!note)return 0
-			// V: note length in seconds
-			var V = 2,
-				len = noteLen
-			if(note < 0) {
-				note *= -1
-				V = 4
-			}
-			if(note < 1) {
-				note *= 100
-				V = 1
-			}
-			note = 130.81 * 1.06 ** note
-			
-			var 
-				// Temp vars for guitar synthesis
-				vv = [],
-				pp = 0, ch = 0,
-				
-				// Modulation
-				// This function generates the i'th sample of a sinusoidal signal with a specific frequency and amplitude
-				b = (note, tt, aa, tick) => Math.sin(note / tt * 6.28 * aa + tick),
-				
-				// Instrument synthesis
-				w = (note, tt) =>
-				
-				  // Piano
-				  Math.sin(note / len * tt * 6.28 + b(note, len, tt, 0) ** 2 + .75 * b(note, len, tt, .25) + .1 * b(note, len, tt, .5)) * .1
-				,
-				// Sound samples
-				D = []
-			
-			// Loop on all the samples
-			for(tick = 0; tick < len * V; tick++){
-				// Fill the samples array
-				D[tick] =
-				
-				  // The first 88 samples represent the note's attack
-				  tick < 88 
-				  ? tick / 88.2 * w(tick, note)
-				  
-				  // The other samples represent the rest of the note
-				  : (1 - (tick - 88.2) / (len * (V - .002))) ** ((Math.log(1e4 * note / len) / 2) ** 2) * w(tick, note)
-			}
-			
-			b = this.contexts[0].createBuffer(1, D.length, noteLen)
-			b.getChannelData(0).set(D)
-			return b
-		})
-		
-		this.noteI = 0
 		this.interval = setInterval(i => {
-			if(this.noteI < this.song.length) {
-				i = this.noteI++
+			if(this.i < this.song.length) {
+				i = this.i++
 				if(this.song[i]) {
-					var ctx = this.contexts[i%10]
-					var source = ctx.createBufferSource()
+					var ctx = this.contexts[i%8],
+						source = ctx.createBufferSource()
 					source.buffer = this.song[i]
 					source.connect(ctx.destination)
 					source.start()
 				}
 			} else {
-				this.noteI = 0
+				this.i = 0
 			}
-		}, tempo)
+		}, tempo || 180)
 	}
 }
