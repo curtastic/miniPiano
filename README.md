@@ -1,5 +1,4 @@
-# UPDATED VERSION HERE:
-https://github.com/curtastic/miniPiano
+# UPDATED VERSION HERE: https://github.com/curtastic/p1
 
 Forked from tiny js from vertfromage forked from xem.
 
