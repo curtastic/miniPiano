@@ -1,4 +1,6 @@
-# miniPiano
+# UPDATED VERSION HERE:
+https://github.com/curtastic/miniPiano
+
 Forked from tiny js from vertfromage forked from xem.
 
 Less than 0.8KB minified!
